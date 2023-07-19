@@ -1,14 +1,12 @@
-import { useState } from "react";
 import Auth from "../components/Auth";
 import splash from "../assets/splash.png";
 
 const LandingPage = () => {
-  const [showAuth, setShowAuth] = useState(false);
   return (
     <>
-      <div className="w-full h-full flex justify-center items-center gap-8    ">
-        <div className="w-[450px] flex flex-col gap-2">
-          <h1 className="font-extrabold text-transparent text-6xl bg-clip-text bg-gradient-to-r from-purple-600 to-red-600">
+      <div className="flex h-full w-full items-center justify-center gap-8">
+        <div className="flex w-[450px] flex-col gap-2">
+          <h1 className="bg-gradient-to-r from-purple-600 to-red-600 bg-clip-text text-6xl font-extrabold text-transparent">
             Sports tracker
           </h1>
           <h2 className="text-xl font-semibold">
@@ -17,15 +15,15 @@ const LandingPage = () => {
             GPT-4.
           </h2>
           <button
-            onClick={() => setShowAuth(true)}
-            className="w-[200px] h-[40px] mt-8 bg-gradient-to-r from-purple-600 to-red-600 rounded-xl font-bold text-white shadow-sm"
+            onClick={() => (window.location.href = "#signup")}
+            className="mt-8 h-[40px] w-[200px] rounded-xl bg-gradient-to-r from-purple-600 to-red-600 font-bold text-white shadow-sm"
           >
             Sign up now
           </button>
         </div>
-        <img src={splash} />
+        <img className="w-[800px]" src={splash} />
       </div>
-      {/* {showAuth && <Auth />} */}
+      <Auth />
     </>
   );
 };
