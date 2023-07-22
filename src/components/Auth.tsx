@@ -1,42 +1,7 @@
 import React, { useState } from "react";
 import login from "../assets/login.webp";
 import logo from "../assets/logo.png";
-import { useAuth } from "../utils/auth";
-
-interface LoginFormData {
-  username: string;
-  password: string;
-}
-
-interface SingupFormData {
-  name?: string;
-  email: string;
-  password: string;
-  confirm_password?: string;
-}
-
-const postData = async (url: string, requestBody: URLSearchParams) => {
-  try {
-    const response = await fetch(url, {
-      method: "POST",
-      body: requestBody.toString(),
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error("Request failed");
-    }
-
-    const responseData = await response.json();
-    return responseData;
-    // Process the response data
-  } catch (error) {
-    // Handle the error
-    console.log(error);
-  }
-};
+import { useAuth, loginUser, registerUser } from "../utils/auth";
 
 const Auth = () => {
   const [isSignup, setIsSignup] = useState(true);
@@ -49,21 +14,10 @@ const Auth = () => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const URL = `${import.meta.env.VITE_BACKEND_URL}/auth/${
-      isSignup ? "register" : "login"
-    }/`;
-    let requestBody = new URLSearchParams();
-    Object.entries(formData).forEach(([key, value]) => {
-      if (key === "email") {
-        requestBody.append("username", value);
-      } else {
-        requestBody.append(key, value);
-      }
-    });
-    const response = await postData(URL, requestBody);
-    if (response.access_token) {
-      localStorage.setItem("token", response.access_token);
-      setToken(response.access_token);
+    if (isSignup) {
+      return await registerUser(formData, setToken);
+    } else {
+      return await loginUser(formData, setToken);
     }
   };
 
