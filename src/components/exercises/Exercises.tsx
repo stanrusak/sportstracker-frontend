@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "../../utils/auth";
 import { getProtectedData } from "../../utils/api";
 import CreateExercise from "./CreateExercise";
-import { Button } from "../layout/Layout";
+import { SiteButton } from "../layout/Layout";
 
 interface MuscleType {
   id: number;
@@ -16,7 +15,7 @@ interface ActivityType {
   description: string;
 }
 
-interface ExerciseType {
+export interface ExerciseType {
   id: number;
   name: string;
   variation: string;
@@ -27,9 +26,7 @@ interface ExerciseType {
 const Exercises = () => {
   const [exercises, setExercises] = useState<ExerciseType[]>();
   const [showCreateNewExercise, setShowCreateNewExercise] = useState(false);
-  const [test, settest] = useState(false);
   const getExercises = async () => {
-    console.log("Fetching exercises");
     try {
       const data = await getProtectedData<ExerciseType[]>("exercises", "");
       setExercises(data);
@@ -45,9 +42,9 @@ const Exercises = () => {
     <section>
       <div className="">
         <h1 className="w-[800px] text-xl font-semibold">Exercises</h1>
-        <Button onClick={() => setShowCreateNewExercise(true)}>
+        <SiteButton onClick={() => setShowCreateNewExercise(true)}>
           New Exercise
-        </Button>
+        </SiteButton>
       </div>
       {showCreateNewExercise && (
         <CreateExercise show={setShowCreateNewExercise} />

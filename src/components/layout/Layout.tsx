@@ -27,7 +27,7 @@ interface ButtonProps {
   onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
-export const Button: React.FC<ButtonProps> = ({ children, onClick }) => {
+export const SiteButton: React.FC<ButtonProps> = ({ children, onClick }) => {
   return (
     <button
       onClick={onClick}

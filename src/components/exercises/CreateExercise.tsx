@@ -12,16 +12,9 @@ import {
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Autocomplete from "@mui/material/Autocomplete";
-import FavoriteBorder from "@mui/icons-material/FavoriteBorder";
-import Favorite from "@mui/icons-material/Favorite";
-
 import { GiMuscularTorso, GiStopwatch } from "react-icons/gi";
 
-import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
-import BookmarkIcon from "@mui/icons-material/Bookmark";
-import Activities from "../activities/Activities";
-import { Button, Icon, iconStyle } from "../layout/Layout";
-
+import { SiteButton, Icon } from "../layout/Layout";
 import { styleTheme } from "../../../styles";
 
 const label = { inputProps: { "aria-label": "Checkbox" } };
@@ -78,7 +71,6 @@ const NinjaSuggestions = ({ muscleName, setExerciseData }) => {
 };
 
 const CreateExercise = ({ show }) => {
-  const [exercises, setExercises] = useState([]);
   const [activities, setActivities] = useState([]);
   const [currentMuscle, setCurrentMuscle] = useState("");
   const [muscles, setMuscles] = useState([]);
@@ -230,8 +222,8 @@ const CreateExercise = ({ show }) => {
               </FormGroup>
             </div>
             <div className="flex w-full justify-around ">
-              <Button onClick={() => handleSubmit()}>Save</Button>
-              <Button onClick={() => show(false)}>Cancel</Button>
+              <SiteButton onClick={() => handleSubmit()}>Save</SiteButton>
+              <SiteButton onClick={() => show(false)}>Cancel</SiteButton>
             </div>
           </div>
           <div className="flex h-full w-1/2 flex-col">
