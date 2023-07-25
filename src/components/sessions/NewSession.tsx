@@ -237,7 +237,7 @@ const CreateSession = ({ show }) => {
       session_data: { exercises: sessionExercises },
     };
     const response = await mutateProtectedData("sessions", data, token);
-    console.log(response);
+    show(false);
   };
   return (
     <div
@@ -305,7 +305,6 @@ const CreateSession = ({ show }) => {
             >
               Add
             </button>
-            <Button onClick={() => console.log(sessionExercises)}>Debug</Button>
           </div>
           <SiteButton onClick={handleSaveSession}>Save Session</SiteButton>
         </div>

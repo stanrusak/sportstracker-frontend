@@ -39,9 +39,9 @@ const Exercises = () => {
     getExercises();
   }, [showCreateNewExercise]);
   return (
-    <section>
+    <section className="my-2">
       <div className="">
-        <h1 className="w-[800px] text-xl font-semibold">Exercises</h1>
+        <h1 className="my-2 text-xl font-semibold">Exercises</h1>
         <SiteButton onClick={() => setShowCreateNewExercise(true)}>
           New Exercise
         </SiteButton>
@@ -49,8 +49,8 @@ const Exercises = () => {
       {showCreateNewExercise && (
         <CreateExercise show={setShowCreateNewExercise} />
       )}
-      <div className="flex flex-wrap gap-4">
-        {exercises?.map((exercise) => (
+      <div className="mt-2 flex flex-wrap gap-4">
+        {exercises?.slice(0, 10).map((exercise) => (
           <div
             key={`exercise-${exercise.id}`}
             className="flex w-[200px] flex-col rounded-xl border-2 bg-white p-4 shadow-md transition-all duration-300 hover:scale-105"
