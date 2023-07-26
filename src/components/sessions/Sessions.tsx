@@ -137,14 +137,13 @@ const Sessions = () => {
   useEffect(() => {
     getSessions(token);
   }, [showCreateNewSession]);
-  if (Object.keys(sessions).length === 0) {
-    return <div>Loading...</div>;
-  }
 
-  const latestDate = Object.keys(sessions)[0];
+  const latestDate = Object.keys(sessions).length
+    ? Object.keys(sessions)[0]
+    : undefined;
 
   return (
-    <section className="h-full">
+    <section className="">
       <div className="">
         <h1 className="my-2 text-xl font-semibold">Sessions</h1>
         <SiteButton onClick={() => setShowCreateNewSession(true)}>
@@ -152,41 +151,43 @@ const Sessions = () => {
         </SiteButton>
       </div>
       {showCreateNewSession && <CreateSession show={setShowCreateNewSession} />}
-      <div className="mt-2 flex">
-        <SelectedWorkoutDay
-          date={selectedDate}
-          dateSessions={sessions[selectedDate]}
-          latest={selectedDate === latestDate}
-        />
-        <div className="flex flex-col gap-1">
-          <h5 className="mx-4 font-semibold">Latest workouts</h5>
-          {Object.entries(sessions).map(([date, dateSessions]) => (
-            <div
-              key={date}
-              onClick={() => setSelectedDate(date)}
-              className={`mx-2 flex w-[220px] cursor-pointer flex-col rounded-xl border-2 ${
-                date === selectedDate
-                  ? "bg-primary text-white"
-                  : "bg-white text-slate-800"
-              } p-4 shadow-md transition-all duration-300 hover:scale-105`}
-            >
-              <h4 className="text-sm font-semibold">
-                {dayjs(date).format("dddd DD/MM")}
-              </h4>
-              <div className="mt-2 flex flex-wrap gap-1">
-                {dateSessions.map((dateSession, idx) => (
-                  <span
-                    key={`date-${idx}`}
-                    className="rounded-full bg-blue-300 px-2 text-xs"
-                  >
-                    {dateSession.activity}
-                  </span>
-                ))}
+      {!!Object.keys(sessions).length && (
+        <div className="mt-2 flex">
+          <SelectedWorkoutDay
+            date={selectedDate}
+            dateSessions={sessions[selectedDate]}
+            latest={selectedDate === latestDate}
+          />
+          <div className="flex flex-col gap-1">
+            <h5 className="mx-4 font-semibold">Latest workouts</h5>
+            {Object.entries(sessions).map(([date, dateSessions]) => (
+              <div
+                key={date}
+                onClick={() => setSelectedDate(date)}
+                className={`mx-2 flex w-[220px] cursor-pointer flex-col rounded-xl border-2 ${
+                  date === selectedDate
+                    ? "bg-primary text-white"
+                    : "bg-white text-slate-800"
+                } p-4 shadow-md transition-all duration-300 hover:scale-105`}
+              >
+                <h4 className="text-sm font-semibold">
+                  {dayjs(date).format("dddd DD/MM")}
+                </h4>
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {dateSessions.map((dateSession, idx) => (
+                    <span
+                      key={`date-${idx}`}
+                      className="rounded-full bg-blue-300 px-2 text-xs"
+                    >
+                      {dateSession.activity}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </section>
   );
 };

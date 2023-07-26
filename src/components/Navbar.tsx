@@ -3,15 +3,25 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { HiMenu, HiX } from "react-icons/hi";
 import logo from "../assets/logo.png";
+import { useAuth } from "../utils/auth";
 
 interface NavLink {
   name: string;
   target: string;
+  onClick?: () => void;
 }
 
-const links: NavLink[] = [
-  { name: "Log in", target: "#login" },
-  { name: "About", target: "/about" },
+const landingLinks: NavLink[] = [
+  { name: "Sign up", target: "#signup" },
+  // { name: "About", target: "/about" },
+];
+
+const loggedInLinks: NavLink[] = [
+  {
+    name: "Log out",
+    target: "",
+    onClick: () => localStorage.removeItem("token"),
+  },
 ];
 
 const NavLink = ({ link }: { link: NavLink }) => {
@@ -20,6 +30,7 @@ const NavLink = ({ link }: { link: NavLink }) => {
       <a
         href={link.target}
         className="duration-400 flex items-center gap-2 text-gray-500 transition-colors hover:text-primary"
+        onClick={link.onClick}
       >
         {link.name}
       </a>
@@ -29,7 +40,9 @@ const NavLink = ({ link }: { link: NavLink }) => {
 
 export const Navbar = () => {
   const [online, setOnline] = useState("");
+  const { token } = useAuth();
 
+  const links = token ? loggedInLinks : landingLinks;
   useEffect(() => {
     fetch(import.meta.env.VITE_BACKEND_URL)
       .then((response) => {

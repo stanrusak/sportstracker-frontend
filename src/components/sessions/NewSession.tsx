@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getProtectedData, mutateProtectedData } from "../../utils/api";
 
-import { Button, FormControl, Input, OutlinedInput } from "@mui/material";
+import { Button, FormControl, OutlinedInput } from "@mui/material";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
@@ -236,7 +236,7 @@ const CreateSession = ({ show }) => {
       date: date.toISOString().slice(0, 10),
       session_data: { exercises: sessionExercises },
     };
-    const response = await mutateProtectedData("sessions", data, token);
+    await mutateProtectedData("sessions", data, token);
     show(false);
   };
   return (

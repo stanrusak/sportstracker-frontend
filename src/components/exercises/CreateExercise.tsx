@@ -15,7 +15,6 @@ import Autocomplete from "@mui/material/Autocomplete";
 import { GiMuscularTorso, GiStopwatch } from "react-icons/gi";
 
 import { SiteButton, Icon } from "../layout/Layout";
-import { styleTheme } from "../../../styles";
 
 const label = { inputProps: { "aria-label": "Checkbox" } };
 const NINJA_API_KEY = "o5ytoTGsuo31Tj2VqIqRWA==D6LvJm0sWJRc941f";

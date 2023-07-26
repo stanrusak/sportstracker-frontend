@@ -10,9 +10,9 @@ const LandingPage = () => {
             Sports tracker
           </h1>
           <h2 className="text-xl font-semibold">
-            Ensure consistent and balanced training. Track your progress with
-            tests. Benefit from a personal AI trainer leveraging the power of
-            GPT-4.
+            Ensure consistent and balanced training. Track your workout
+            sessions. Monitor your progress with tests*. Benefit from a personal
+            AI trainer leveraging the power of GPT-4*.
           </h2>
           <button
             onClick={() => (window.location.href = "#signup")}
@@ -20,6 +20,7 @@ const LandingPage = () => {
           >
             Sign up now
           </button>
+          <span className="text-xs">* Not yet implemented</span>
         </div>
         <img className="w-[800px]" src={splash} />
       </div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { getProtectedData } from "../../utils/api";
 import { SiteButton } from "../layout/Layout";
 import { ActivityType } from "../../types";

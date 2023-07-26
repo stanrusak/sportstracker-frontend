@@ -1,5 +1,3 @@
-import { styleTheme } from "../../../styles";
-
 export const iconStyle = { width: 30, height: 30 };
 
 interface IconProps {
@@ -13,10 +11,10 @@ export const Icon: React.FC<IconProps> = ({
   filled,
   style = iconStyle,
 }) => {
-  const Icon = icon;
+  const IconComponent = icon;
 
   return (
-    <Icon
+    <IconComponent
       style={filled ? { ...iconStyle, fill: theme.colors.primary } : style}
     />
   );
