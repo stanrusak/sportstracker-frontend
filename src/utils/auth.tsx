@@ -3,6 +3,8 @@ import { createContext, useContext, useState } from "react";
 interface AuthContextType {
   token: string | null;
   setToken: (token: string | null) => void;
+  userData: {} | null;
+  setUserData: (userData: {} | null) => void;
 }
 
 interface AuthProviderProps {
@@ -12,6 +14,8 @@ interface AuthProviderProps {
 const AuthContext = createContext<AuthContextType>({
   token: null,
   setToken: () => {},
+  userData: null,
+  setUserData: () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -19,9 +23,10 @@ export const useAuth = () => useContext(AuthContext);
 const storedToken = localStorage.getItem("token");
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [token, setToken] = useState<string | null>(storedToken);
+  const [userData, setUserData] = useState<{} | null>({});
 
   return (
-    <AuthContext.Provider value={{ token, setToken }}>
+    <AuthContext.Provider value={{ token, setToken, userData, setUserData }}>
       {children}
     </AuthContext.Provider>
   );
