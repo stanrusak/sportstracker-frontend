@@ -34,26 +34,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 // post form data to API
 const postFormData = async (url: string, requestBody: URLSearchParams) => {
-  try {
-    const response = await fetch(url, {
-      method: "POST",
-      body: requestBody.toString(),
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    });
+  const response = await fetch(url, {
+    method: "POST",
+    body: requestBody.toString(),
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+  });
 
-    if (!response.ok) {
+  if (!response.ok) {
+    if (response.status === 401) throw new Error("Unauthorized");
+    else {
+      console.log(await response.json());
       throw new Error("Request failed");
     }
-
-    const responseData = await response.json();
-    return responseData;
-    // Process the response data
-  } catch (error) {
-    // Handle the error
-    console.log(error);
   }
+
+  const responseData = await response.json();
+  return responseData;
 };
 
 export interface SingupFormData {
@@ -88,6 +86,7 @@ export const loginUser = async (
   } else {
     throw new Error("Could not login user");
   }
+  window.location.reload();
   return response;
 };
 
