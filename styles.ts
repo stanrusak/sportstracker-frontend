@@ -8,10 +8,10 @@ export const styleTheme: Partial<ThemeConfig> = {
     accent: "#345eeb",
     bglight: "#2f363e",
     bgprimary: {
-      default: "#2f363e", // "#f5f8fa"
+      DEFAULT: "#2f363e", // "#f5f8fa"
       nav: "#1f262e", // white
     },
-    bgsecondary: "#3f464e",
+    bgsecondary: "#1f262e",
   },
   height: {
     navbar: navbarHeight,
