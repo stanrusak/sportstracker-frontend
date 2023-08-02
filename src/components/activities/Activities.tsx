@@ -52,7 +52,7 @@ const AddActivity = ({ show }) => {
   const [activities, setActivities] = useState([]);
 
   const getData = async () => {
-    setActivities(await getProtectedData("activities", ""));
+    setActivities(await getProtectedData("activities/", ""));
   };
 
   useEffect(() => {

@@ -86,8 +86,8 @@ const CreateExercise = ({ show, setExercises }) => {
   });
 
   const getData = async () => {
-    setActivities(await getProtectedData("activities", ""));
-    setMuscles(await getProtectedData("muscles", ""));
+    setActivities(await getProtectedData("activities/", ""));
+    setMuscles(await getProtectedData("muscles/", ""));
   };
 
   useEffect(() => {
@@ -96,7 +96,7 @@ const CreateExercise = ({ show, setExercises }) => {
 
   const handleSubmit = async () => {
     const newExercise = await mutateProtectedData(
-      "exercises",
+      "exercises/",
       exerciseData,
       "",
     );

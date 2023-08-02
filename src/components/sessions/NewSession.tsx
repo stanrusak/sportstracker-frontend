@@ -51,16 +51,20 @@ const processSets = (sets: SetType[]) => {
 const ExerciseCard = ({ idx, exerciseData, setEditing }) => {
   const processedSets = processSets(exerciseData.sets);
   return (
-    <div className="flex gap-4 rounded-lg bg-blue-200 p-2">
+    <div className="flex gap-4 rounded-lg bg-slate-300 p-2">
       <div className="flex flex-col">
-        <span className="font-semibold">{exerciseData.name}</span>
-        <span className="text-xs uppercase">{exerciseData.variation}</span>
+        <span className="font-semibold text-bgprimary">
+          {exerciseData.name}
+        </span>
+        <span className="text-xs uppercase text-bgsecondary">
+          {exerciseData.variation}
+        </span>
       </div>
       <div className="flex gap-4">
         {processedSets.map((set, idx) => (
           <div
             key={idx}
-            className="flex flex-col items-center rounded-2xl border-2 border-blue-900 bg-blue-700 p-2 text-white"
+            className="flex flex-col items-center rounded-2xl border-2 border-blue-900  p-2 text-bgprimary"
           >
             <h5 className="text-sm">{set.weight}kg</h5>
             <span>{set.reps}</span>
@@ -181,7 +185,7 @@ const CreateSession = ({ show }) => {
   const [sessionExercises, setSessionExercises] = useState([]);
   const [editing, setEditing] = useState<number[]>([]);
   const getActivities = async () => {
-    setActivities(await getProtectedData("activities", ""));
+    setActivities(await getProtectedData("activities/", ""));
   };
 
   useEffect(() => {
@@ -192,7 +196,7 @@ const CreateSession = ({ show }) => {
     ExerciseType[] & { label: string }
   >();
   const getExercises = async () => {
-    const response = await getProtectedData<ExerciseType[]>("exercises", "");
+    const response = await getProtectedData<ExerciseType[]>("exercises/", "");
     setExercises(
       // add labels to be displayed in the autocomplete
       response.map((exercise) => ({
@@ -230,7 +234,7 @@ const CreateSession = ({ show }) => {
     setSessionExercises(newSessionExercises);
   };
 
-  const { token } = useAuth();
+  const { token, userData, setUserData } = useAuth();
   const handleSaveSession = async () => {
     if (!currentActivityId) {
       setActivityError(true);
@@ -241,7 +245,9 @@ const CreateSession = ({ show }) => {
       date: date.toISOString().slice(0, 10),
       session_data: { exercises: sessionExercises },
     };
-    await mutateProtectedData("sessions", data, token);
+    const newSession = await mutateProtectedData("sessions/", data, token);
+    const updatedSessions = await getProtectedData("sessions/", token);
+    setUserData({ ...userData, sessions: updatedSessions });
     show(false);
   };
   return (

@@ -28,7 +28,7 @@ const App = () => {
       try {
         var data = await getProtectedData("users/me/data", token);
         setLloadingMessage("Loading session data...");
-        var sessions = await getProtectedData("sessions", token);
+        var sessions = await getProtectedData("sessions/", token);
       } catch (error) {
         // clear token if expired
         if (error instanceof UnauthorizedError) {

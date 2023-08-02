@@ -64,7 +64,7 @@ const ExerciseCard = ({
         {exercise.activities.map((activity) => (
           <span
             key={`exercise-activity-${activity.id}`}
-            className="rounded-xl bg-blue-500 p-2 text-xs text-white"
+            className=" m-1 inline-block rounded-xl bg-blue-500 p-2 text-xs text-white"
           >
             {activity?.name}
           </span>
@@ -76,7 +76,6 @@ const ExerciseCard = ({
 
 const AddExercise = ({ show }) => {
   const { token, userData, setUserData } = useAuth();
-  console.log(userData);
   const [userExercises, setUserExercises] = useState(
     userData.exercises.map((exercise) => exercise.id),
   );
@@ -84,7 +83,7 @@ const AddExercise = ({ show }) => {
   const [showCreateNewExercise, setShowCreateNewExercise] = useState(false);
 
   const getData = async () => {
-    setExercises(await getProtectedData("exercises", ""));
+    setExercises(await getProtectedData("exercises/", ""));
   };
 
   useEffect(() => {
@@ -92,16 +91,17 @@ const AddExercise = ({ show }) => {
   }, [setShowCreateNewExercise]);
 
   const handleSave = async () => {
+    let response = { exercises: [] };
     if (userExercises.length > 0) {
-      var response = await mutateProtectedData(
+      response = await mutateProtectedData(
         "users/me/exercises",
         userExercises,
         token,
         "PATCH",
       );
     }
-    console.log(response);
     setUserData((oldData) => ({ ...oldData, exercises: response.exercises }));
+
     show(false);
   };
   return (
