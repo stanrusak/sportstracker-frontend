@@ -4,7 +4,7 @@ import splash from "../assets/splash.png";
 const LandingPage = () => {
   return (
     <>
-      <div className="flex h-full w-full items-center justify-center gap-8">
+      <div className="flex h-screen w-full items-center justify-center gap-8">
         <div className="flex w-[450px] flex-col gap-2">
           <h1 className="bg-gradient-to-r from-purple-600 to-red-600 bg-clip-text text-6xl font-extrabold text-transparent">
             Sports tracker
@@ -16,7 +16,7 @@ const LandingPage = () => {
           </h2>
           <button
             onClick={() => (window.location.href = "#signup")}
-            className="mt-8 h-[40px] w-[200px] rounded-xl bg-gradient-to-r from-purple-600 to-red-600 font-bold text-white shadow-sm"
+            className="mt-8 h-[40px] w-[200px] rounded-xl bg-gradient-to-r from-purple-600 to-red-600 font-bold text-white shadow-sm transition-all duration-300 hover:scale-105 hover:from-red-600 hover:to-purple-600 hover:shadow-xl"
           >
             Sign up now
           </button>

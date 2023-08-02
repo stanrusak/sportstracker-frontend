@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
 import { getProtectedData, mutateProtectedData } from "../../utils/api";
 
-import { Button, FormControl, OutlinedInput } from "@mui/material";
+import {
+  Button,
+  FormControl,
+  OutlinedInput,
+  StyledEngineProvider,
+} from "@mui/material";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
@@ -46,16 +51,20 @@ const processSets = (sets: SetType[]) => {
 const ExerciseCard = ({ idx, exerciseData, setEditing }) => {
   const processedSets = processSets(exerciseData.sets);
   return (
-    <div className="flex gap-4 rounded-lg bg-blue-200 p-2">
+    <div className="flex gap-4 rounded-lg bg-slate-300 p-2">
       <div className="flex flex-col">
-        <span className="font-semibold">{exerciseData.name}</span>
-        <span className="text-xs uppercase">{exerciseData.variation}</span>
+        <span className="font-semibold text-bgprimary">
+          {exerciseData.name}
+        </span>
+        <span className="text-xs uppercase text-bgsecondary">
+          {exerciseData.variation}
+        </span>
       </div>
       <div className="flex gap-4">
         {processedSets.map((set, idx) => (
           <div
             key={idx}
-            className="flex flex-col items-center rounded-2xl border-2 border-blue-900 bg-blue-700 p-2 text-white"
+            className="flex flex-col items-center rounded-2xl border-2 border-blue-900  p-2 text-bgprimary"
           >
             <h5 className="text-sm">{set.weight}kg</h5>
             <span>{set.reps}</span>
@@ -125,7 +134,7 @@ const EditExercise = ({
 }) => {
   const [sets, setSets] = useState([]);
   return (
-    <div className="flex rounded-xl border border-blue-200 p-2 shadow-md">
+    <div className="flex rounded-xl border border-blue-200 bg-slate-200 p-2 shadow-md">
       <div className="flex flex-col gap-2">
         <h2 className="text-center text-sm font-semibold uppercase text-slate-500">
           Add new exercise
@@ -176,7 +185,7 @@ const CreateSession = ({ show }) => {
   const [sessionExercises, setSessionExercises] = useState([]);
   const [editing, setEditing] = useState<number[]>([]);
   const getActivities = async () => {
-    setActivities(await getProtectedData("activities", ""));
+    setActivities(await getProtectedData("activities/", ""));
   };
 
   useEffect(() => {
@@ -187,7 +196,7 @@ const CreateSession = ({ show }) => {
     ExerciseType[] & { label: string }
   >();
   const getExercises = async () => {
-    const response = await getProtectedData<ExerciseType[]>("exercises", "");
+    const response = await getProtectedData<ExerciseType[]>("exercises/", "");
     setExercises(
       // add labels to be displayed in the autocomplete
       response.map((exercise) => ({
@@ -225,7 +234,7 @@ const CreateSession = ({ show }) => {
     setSessionExercises(newSessionExercises);
   };
 
-  const { token } = useAuth();
+  const { token, userData, setUserData } = useAuth();
   const handleSaveSession = async () => {
     if (!currentActivityId) {
       setActivityError(true);
@@ -236,12 +245,14 @@ const CreateSession = ({ show }) => {
       date: date.toISOString().slice(0, 10),
       session_data: { exercises: sessionExercises },
     };
-    await mutateProtectedData("sessions", data, token);
+    const newSession = await mutateProtectedData("sessions/", data, token);
+    const updatedSessions = await getProtectedData("sessions/", token);
+    setUserData({ ...userData, sessions: updatedSessions });
     show(false);
   };
   return (
     <div
-      className={`rounded-2xln absolute left-1/2 top-1/2 z-10 h-[80vh] w-[95vw] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-xl border-2 border-blue-500 bg-white shadow-md sm:w-[550px] md:w-[650px]`}
+      className={`absolute left-1/2 top-1/2 z-10 h-[80vh] w-[95vw] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-2xl rounded-xl border-2 border-blue-500 bg-bgsecondary shadow-md sm:w-[550px] md:w-[650px]`}
     >
       <div className="relative w-full">
         <button onClick={() => show(false)} className="absolute right-2">
@@ -254,28 +265,36 @@ const CreateSession = ({ show }) => {
         <div className="mt-4 flex flex-col">
           <div className="flex items-center gap-2">
             <DatePicker
-              label="Date"
+              // label="Date"
               value={date}
               onChange={(newDate) => setDate(newDate as Dayjs)}
-              sx={{ width: 150 }}
+              className="rounded-md bg-slate-300"
             />
-            <FormControl sx={{ minWidth: 200 }}>
-              <InputLabel id="activity-select-label">Activity</InputLabel>
-              <Select
-                labelId="activity-select-label"
-                id="demo-simple-select-helper"
-                value={currentActivityId}
-                label="Activity"
-                onChange={handleSelectActivity}
-                error={activityError}
-              >
-                {activities.map(({ id, name }) => (
-                  <MenuItem key={`activity-${id}`} value={id}>
-                    {name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            <StyledEngineProvider injectFirst>
+              <FormControl sx={{ minWidth: 200 }}>
+                <InputLabel
+                  id="activity-select-label"
+                  className="rounded-full bg-slate-300 px-2 text-bgprimary"
+                >
+                  Activity
+                </InputLabel>
+                <Select
+                  labelId="activity-select-label"
+                  id="demo-simple-select-helper"
+                  value={currentActivityId}
+                  // label="Activity"
+                  onChange={handleSelectActivity}
+                  error={activityError}
+                  className="bg-slate-300 text-bgprimary"
+                >
+                  {activities.map(({ id, name }) => (
+                    <MenuItem key={`activity-${id}`} value={id}>
+                      {name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </StyledEngineProvider>
           </div>
           <h2 className="mt-4 text-xl font-semibold">Exercises</h2>
           <div className="mt-4 flex h-[300px] flex-col gap-2 overflow-auto">

@@ -1,3 +1,16 @@
+interface CustomErrorProps {
+  errorCode: number;
+}
+
+export class UnauthorizedError extends Error implements CustomErrorProps {
+  errorCode: number;
+  constructor(message: string, errorCode: number) {
+    super(message);
+    this.name = "UnauthorizedError";
+    this.errorCode = errorCode;
+  }
+}
+
 export const getProtectedData = async <T>(
   endPoint: string,
   token: string | null,
@@ -13,7 +26,7 @@ export const getProtectedData = async <T>(
   const data = await response.json();
   if (response.ok) return data as T;
 
-  if (response.status === 401) throw new Error(`401: Unauthorized`);
+  if (response.status === 401) throw new UnauthorizedError(`Unauthorized`, 401);
   throw new Error(`Could not fetch data from /${endPoint}`);
 };
 

@@ -9,6 +9,7 @@ const Auth = () => {
     email: "",
     password: "",
   });
+  const [errorMessage, setErrorMessage] = useState(null);
 
   const { setToken } = useAuth();
 
@@ -17,7 +18,14 @@ const Auth = () => {
     if (isSignup) {
       return await registerUser(formData, setToken);
     } else {
-      return await loginUser(formData, setToken);
+      try {
+        const loginResponse = await loginUser(formData, setToken);
+        return loginResponse;
+      } catch (error) {
+        if (error.message === "Unauthorized") {
+          setErrorMessage("Invalid credentials");
+        }
+      }
     }
   };
 
@@ -30,9 +38,9 @@ const Auth = () => {
   return (
     <div
       id="signup"
-      className="flex min-h-full flex-1 flex-col items-center justify-center px-6 py-12 lg:px-8"
+      className="flex min-h-screen flex-1 flex-col items-center justify-center px-6 py-12 lg:px-8"
     >
-      <div className="flex h-[600px] w-[800px] justify-between rounded-lg shadow-xl">
+      <div className="mt-10 flex h-[600px] w-[800px] justify-between rounded-lg bg-white shadow-xl">
         <div className="w-1/2 px-6">
           <div className=" sm:mx-auto sm:w-full sm:max-w-sm">
             <img
@@ -128,7 +136,11 @@ const Auth = () => {
                 </button>
               </div>
             </form>
-
+            {errorMessage && (
+              <p className="mt-2 w-full text-center text-red-500">
+                {errorMessage}
+              </p>
+            )}
             <p className="mt-10 text-center text-sm text-gray-500">
               Not a member?{" "}
               <span

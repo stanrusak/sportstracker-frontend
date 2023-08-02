@@ -29,7 +29,7 @@ const NavLink = ({ link }: { link: NavLink }) => {
     <div className="m-4 cursor-pointer text-xs uppercase">
       <a
         href={link.target}
-        className="duration-400 flex items-center gap-2 text-gray-500 transition-colors hover:text-primary"
+        className="duration-400 flex items-center gap-2 text-gray-500 transition-colors hover:text-accent"
         onClick={link.onClick}
       >
         {link.name}
@@ -55,13 +55,13 @@ export const Navbar = () => {
   const [toggle, setToggle] = useState(false);
   return (
     <nav
-      className={`h-navbar fixed z-10 flex w-full justify-between bg-white px-16 shadow-md`}
+      className={`fixed z-10 flex h-navbar w-full justify-between bg-bgprimary-nav px-16 shadow-md`}
     >
       <div className="mx-4 flex items-center">
         <a
-          href="#Home"
+          href="/"
           className={`flex items-center text-3xl font-bold uppercase ${
-            online ? "text-primary" : "text-red-500"
+            online ? "text-accent" : "text-red-500"
           }`}
         >
           <img className="h-[60px] w-[60px] object-cover" src={logo} />
@@ -76,7 +76,7 @@ export const Navbar = () => {
       <div className="flex flex-col md:hidden">
         {!toggle && (
           <HiMenu
-            className="m-2 h-10 w-10 text-primary"
+            className="m-2 h-10 w-10 text-accent"
             onClick={() => setToggle(true)}
           />
         )}

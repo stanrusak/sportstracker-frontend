@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getProtectedData, mutateProtectedData } from "../../utils/api";
+import { StyledEngineProvider } from "@mui/material/styles";
 
 import {
   TextField,
@@ -41,22 +42,23 @@ const NinjaSuggestions = ({ muscleName, setExerciseData }) => {
   return (
     <>
       <h2 className="mt-[-5vh] text-lg font-bold">Suggested exercises</h2>
-      <p className="text-xs text-slate-500">
+      <p className="text-xs text-slate-400">
         Here are some suggestions coming from an external API. This will go away
         once the app has a substantial exercise database of its own. Pick one
         from the list below and fill in the rest of the info. Or create your
         own.
       </p>
-      <div className="mt-2 h-[50vh] overflow-y-auto">
-        {ninjaExercises.map((exercise) => (
+      <div className="scrollbar mr-2 mt-2 h-[50vh] overflow-y-auto">
+        {ninjaExercises.map((exercise, idx) => (
           <div
+            key={`ninja-${idx}`}
             onClick={() => {
               setExerciseData((prevData) => ({
                 ...prevData,
                 name: exercise.name,
               }));
             }}
-            className="mx-4 flex w-[80%] cursor-pointer flex-col gap-1 rounded-md px-4 py-2 hover:scale-110 hover:bg-slate-200"
+            className="mx-4 mt-2 flex w-[80%] cursor-pointer flex-col gap-1 rounded-md px-4 py-2 hover:scale-110 hover:bg-slate-200 hover:text-bgprimary"
           >
             <h3 className="text-sm font-bold">{exercise.name}</h3>
             <h4 className="text-sm font-semibold text-slate-600">
@@ -69,7 +71,7 @@ const NinjaSuggestions = ({ muscleName, setExerciseData }) => {
   );
 };
 
-const CreateExercise = ({ show }) => {
+const CreateExercise = ({ show, setExercises }) => {
   const [activities, setActivities] = useState([]);
   const [currentMuscle, setCurrentMuscle] = useState("");
   const [muscles, setMuscles] = useState([]);
@@ -84,8 +86,8 @@ const CreateExercise = ({ show }) => {
   });
 
   const getData = async () => {
-    setActivities(await getProtectedData("activities", ""));
-    setMuscles(await getProtectedData("muscles", ""));
+    setActivities(await getProtectedData("activities/", ""));
+    setMuscles(await getProtectedData("muscles/", ""));
   };
 
   useEffect(() => {
@@ -93,151 +95,165 @@ const CreateExercise = ({ show }) => {
   }, []);
 
   const handleSubmit = async () => {
-    await mutateProtectedData("exercises", exerciseData, "");
+    const newExercise = await mutateProtectedData(
+      "exercises/",
+      exerciseData,
+      "",
+    );
+    setExercises((oldExercises) => [...oldExercises, newExercise]);
     show(false);
   };
 
   return (
-    <div
-      className={`rounded-2xln absolute left-1/2 top-1/2 flex h-[80vh] w-[95vw] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-xl border-2 border-blue-500 bg-white shadow-md sm:w-[550px] md:w-[650px]`}
-    >
-      <div className="relative w-full">
-        <button onClick={() => show(false)} className="absolute right-2">
-          x
-        </button>
-      </div>
-      <div className="m-4 flex w-full flex-grow flex-col">
-        <h1 className="m-4 text-2xl font-bold">Create New Exercise</h1>
-        <div className="mt-8 flex flex-grow">
-          <div className="flex h-full w-1/2 flex-col items-center gap-2">
-            <div className="flex flex-grow flex-col gap-2">
-              <FormControl sx={{ width: "100%" }}>
-                <InputLabel id="muscle-select-label">Muscle Group</InputLabel>
-                <Select
-                  labelId="muscle-select-label"
-                  id="demo-simple-select-helper"
-                  value={currentMuscle}
-                  label="Muscle"
+    <StyledEngineProvider injectFirst>
+      <div
+        className={`rounded-2xln absolute left-1/2 top-1/2 flex h-[80vh] w-[95vw] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-xl border-2 border-blue-500 bg-bgprimary shadow-md sm:w-[550px] md:w-[650px]`}
+      >
+        <div className="relative w-full">
+          <button onClick={() => show(false)} className="absolute right-2">
+            x
+          </button>
+        </div>
+        <div className="m-4 flex w-full flex-grow flex-col">
+          <h1 className="m-4 text-2xl font-bold">Create New Exercise</h1>
+          <div className="mt-8 flex flex-grow">
+            <div className="flex h-full w-1/2 flex-col items-center gap-2">
+              <div className="flex flex-grow flex-col gap-4">
+                <FormControl className="w-full">
+                  <InputLabel
+                    id="muscle-select-label"
+                    className="rounded-full bg-slate-300 px-2 text-bgprimary"
+                  >
+                    Muscle Groups
+                  </InputLabel>
+                  <Select
+                    labelId="muscle-select-label"
+                    id="demo-simple-select-helper"
+                    value={currentMuscle}
+                    label="Muscle"
+                    className="bg-slate-300"
+                    onChange={(e) => {
+                      setCurrentMuscle(e.target.value);
+                      setExerciseData((prevData) => ({
+                        ...prevData,
+                        muscle_groups: [e.target.value.id],
+                      }));
+                    }}
+                  >
+                    {muscles.map((muscle) => (
+                      <MenuItem key={`muscle-${muscle.id}`} value={muscle}>
+                        {muscle.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <TextField
+                  id="exercise-name"
+                  value={exerciseData.name}
+                  label="Name"
+                  variant="outlined"
+                  className="min-w-full rounded-md bg-slate-300"
                   onChange={(e) => {
-                    setCurrentMuscle(e.target.value);
                     setExerciseData((prevData) => ({
                       ...prevData,
-                      muscle_groups: [e.target.value.id],
+                      name: e.target.value,
                     }));
                   }}
-                >
-                  {muscles.map((muscle) => (
-                    <MenuItem key={`muscle-${muscle.id}`} value={muscle}>
-                      {muscle.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <TextField
-                sx={{ minWidth: "100%" }}
-                id="exercise-name"
-                value={exerciseData.name}
-                label=""
-                variant="outlined"
-                onChange={(e) => {
-                  setExerciseData((prevData) => ({
-                    ...prevData,
-                    name: e.target.value,
-                  }));
-                }}
-              />
-              <TextField
-                id="exercise-variation"
-                label="Variation"
-                variant="outlined"
-                sx={{ minWidth: "100%" }}
-                onChange={(e) => {
-                  setExerciseData((prevData) => ({
-                    ...prevData,
-                    variation: e.target.value,
-                  }));
-                }}
-              />
+                />
+                <TextField
+                  id="exercise-variation"
+                  label="Variation"
+                  variant="outlined"
+                  className="min-w-full rounded-md bg-slate-300"
+                  onChange={(e) => {
+                    setExerciseData((prevData) => ({
+                      ...prevData,
+                      variation: e.target.value,
+                    }));
+                  }}
+                />
 
-              <Autocomplete
-                multiple
-                limitTags={2}
-                id="activity"
-                onChange={(event: any, selectedActivities) =>
-                  setExerciseData((prevData) => ({
-                    ...prevData,
-                    activities: selectedActivities.map((act) => act.id),
-                  }))
-                }
-                options={activities}
-                getOptionLabel={(activity) => activity.name}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Activities"
-                    placeholder="Activities"
+                <Autocomplete
+                  multiple
+                  limitTags={2}
+                  id="activity"
+                  className="max-w-[300px] rounded-md bg-slate-300 px-2 text-bgprimary"
+                  onChange={(event: any, selectedActivities) =>
+                    setExerciseData((prevData) => ({
+                      ...prevData,
+                      activities: selectedActivities.map((act) => act.id),
+                    }))
+                  }
+                  options={activities}
+                  getOptionLabel={(activity) => activity.name}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Activities"
+                      placeholder="Activities"
+                    />
+                  )}
+                  sx={{ width: "100%" }}
+                />
+                <FormGroup
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        {...label}
+                        icon={<Icon icon={GiMuscularTorso} />}
+                        checkedIcon={<Icon icon={GiMuscularTorso} />}
+                        onChange={(e) =>
+                          setExerciseData((prevData) => ({
+                            ...prevData,
+                            bodyweight: e.target.checked,
+                          }))
+                        }
+                      />
+                    }
+                    label="Bodyweight"
                   />
-                )}
-                sx={{ width: "100%" }}
-              />
-              <FormGroup
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                }}
-              >
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      {...label}
-                      icon={<Icon icon={GiMuscularTorso} />}
-                      checkedIcon={<Icon icon={GiMuscularTorso} />}
-                      onChange={(e) =>
-                        setExerciseData((prevData) => ({
-                          ...prevData,
-                          bodyweight: e.target.checked,
-                        }))
-                      }
-                    />
-                  }
-                  label="Bodyweight"
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      {...label}
-                      icon={<Icon icon={GiStopwatch} />}
-                      checkedIcon={<Icon icon={GiStopwatch} />}
-                      onChange={(e) =>
-                        setExerciseData((prevData) => ({
-                          ...prevData,
-                          static: e.target.checked,
-                        }))
-                      }
-                    />
-                  }
-                  label="Static"
-                />
-              </FormGroup>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        {...label}
+                        icon={<Icon icon={GiStopwatch} />}
+                        checkedIcon={<Icon icon={GiStopwatch} />}
+                        onChange={(e) =>
+                          setExerciseData((prevData) => ({
+                            ...prevData,
+                            static: e.target.checked,
+                          }))
+                        }
+                      />
+                    }
+                    label="Static"
+                  />
+                </FormGroup>
+              </div>
+              <div className="flex w-full justify-around ">
+                <SiteButton onClick={() => handleSubmit()}>Save</SiteButton>
+                <SiteButton onClick={() => show(false)}>Cancel</SiteButton>
+              </div>
             </div>
-            <div className="flex w-full justify-around ">
-              <SiteButton onClick={() => handleSubmit()}>Save</SiteButton>
-              <SiteButton onClick={() => show(false)}>Cancel</SiteButton>
+            <div className="flex h-full w-1/2 flex-col">
+              {currentMuscle ? (
+                <NinjaSuggestions
+                  muscleName={currentMuscle.name}
+                  setExerciseData={setExerciseData}
+                />
+              ) : (
+                <p className="mt-10 text-center">Choose muscle group</p>
+              )}
             </div>
-          </div>
-          <div className="flex h-full w-1/2 flex-col">
-            {currentMuscle ? (
-              <NinjaSuggestions
-                muscleName={currentMuscle.name}
-                setExerciseData={setExerciseData}
-              />
-            ) : (
-              <p className="mt-10 text-center">Choose muscle group</p>
-            )}
           </div>
         </div>
       </div>
-    </div>
+    </StyledEngineProvider>
   );
 };
 

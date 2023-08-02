@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAuth } from "../../utils/auth";
-import { getProtectedData } from "../../utils/api";
 import CreateSession from "./NewSession";
 import { SiteButton } from "../layout/Layout";
 import dayjs from "dayjs";
@@ -39,7 +38,7 @@ const SelectedWorkoutDay = ({ date, dateSessions, latest }) => {
   };
 
   return (
-    <div className="flex h-full w-[350px] flex-col rounded-xl border-2 bg-white  shadow-md transition-all duration-300 hover:scale-105">
+    <div className="flex h-full w-[350px] flex-col rounded-xl  bg-bgsecondary  shadow-md transition-all duration-300 hover:scale-105">
       <img
         src={activityImages[dateSessions[0].activity]}
         className="rounded-t-xl"
@@ -54,8 +53,8 @@ const SelectedWorkoutDay = ({ date, dateSessions, latest }) => {
               <div key={`session-${session.id}`}>
                 <h3 className="font-semibold">{session.activity}</h3>
                 <div className="flex flex-col px-2">
-                  {aggregateData.map((exercise) => (
-                    <div key={`exercise-${session.id}-${exercise.name}`}>
+                  {aggregateData.map((exercise, exIdx) => (
+                    <div key={`exercise-${session.id}-${exIdx}`}>
                       <h4>{exercise.name}</h4>
                       <span className="text-xs">
                         Max: {exercise.max} | Volume: {exercise.volume}
@@ -73,75 +72,40 @@ const SelectedWorkoutDay = ({ date, dateSessions, latest }) => {
 };
 
 const Sessions = () => {
-  const { token, setToken } = useAuth();
-  // const [activities, setActivities] = useState<{ [id: number]: ActivityType }>(
-  //   [],
-  // );
-  const [sessions, setSessions] = useState<{ [date: string]: SessionType[] }>(
+  const { userData } = useAuth();
+  const activitiesById = userData.activities.reduce(
+    (result: { [key: number]: ActivityType }, item: ActivityType) => {
+      result[item.id] = item;
+      return result;
+    },
     {},
   );
-  const [selectedDate, setSelectedDate] = useState("");
-  const [showCreateNewSession, setShowCreateNewSession] = useState(false);
 
-  const getSessions = async (token: string | null) => {
-    try {
-      // get activities
-      const activityData = await getProtectedData<ActivityType[]>(
-        "activities",
-        "",
-      );
-      // store as an id => object map for faster lookup
-      const activitiesById = activityData.reduce(
-        (result: { [key: number]: ActivityType }, item: ActivityType) => {
-          result[item.id] = item;
-          return result;
-        },
-        {},
-      );
-      // setActivities(activitiesById);
-
-      const sessionData = await getProtectedData<SessionType[]>(
-        "sessions",
-        token,
-      );
-
-      const sessionsByDate = sessionData
-        .slice(0, 15)
-        .reduce(
-          (result: { [key: string]: SessionType[] }, item: SessionType) => {
-            if (!result[item.date]) {
-              result[item.date] = [];
-            }
-            result[item.date].push({
-              ...item,
-              activity: activitiesById[item.activity_id].name,
-            });
-            return result;
-          },
-          {},
-        );
-
-      setSessions(sessionsByDate);
-      setSelectedDate(Object.keys(sessionsByDate)[0]);
-    } catch (error) {
-      // clear token if expired
-      if (error instanceof Error && error.message === "401: Unauthorized") {
-        setToken(null);
-        localStorage.removeItem("token");
-      } else {
-        console.log("Error in getSessions:", error);
+  console.log(activitiesById);
+  // group sessions by date
+  const sessions = userData.sessions.reduce(
+    (result: { [key: string]: SessionType[] }, item: SessionType) => {
+      if (!result[item.date]) {
+        result[item.date] = [];
       }
-    }
-  };
+      result[item.date].push({
+        ...item,
+        activity: activitiesById[item.activity_id]?.name,
+      });
+      return result;
+    },
+    {},
+  );
 
-  useEffect(() => {
-    getSessions(token);
-  }, [showCreateNewSession]);
+  const [selectedDate, setSelectedDate] = useState(
+    Object.keys(sessions).length === 0 ? null : Object.keys(sessions)[0],
+  );
+  const [showCreateNewSession, setShowCreateNewSession] = useState(false);
 
   const latestDate = Object.keys(sessions).length
     ? Object.keys(sessions)[0]
     : undefined;
-
+  console.log(sessions);
   return (
     <section className="">
       <div className="">
@@ -160,31 +124,33 @@ const Sessions = () => {
           />
           <div className="flex flex-col gap-1">
             <h5 className="mx-4 font-semibold">Latest workouts</h5>
-            {Object.entries(sessions).map(([date, dateSessions]) => (
-              <div
-                key={date}
-                onClick={() => setSelectedDate(date)}
-                className={`mx-2 flex w-[220px] cursor-pointer flex-col rounded-xl border-2 ${
-                  date === selectedDate
-                    ? "bg-primary text-white"
-                    : "bg-white text-slate-800"
-                } p-4 shadow-md transition-all duration-300 hover:scale-105`}
-              >
-                <h4 className="text-sm font-semibold">
-                  {dayjs(date).format("dddd DD/MM")}
-                </h4>
-                <div className="mt-2 flex flex-wrap gap-1">
-                  {dateSessions.map((dateSession, idx) => (
-                    <span
-                      key={`date-${idx}`}
-                      className="rounded-full bg-blue-300 px-2 text-xs"
-                    >
-                      {dateSession.activity}
-                    </span>
-                  ))}
+            {Object.entries(sessions)
+              .slice(0, 5)
+              .map(([date, dateSessions]) => (
+                <div
+                  key={date}
+                  onClick={() => setSelectedDate(date)}
+                  className={` mx-2 flex w-[140px] cursor-pointer flex-col rounded-xl border-2 border-accent ${
+                    date === selectedDate
+                      ? "bg-accent text-white"
+                      : "bg-bgsecondary text-slate-200"
+                  } p-4 shadow-md transition-all duration-300 hover:scale-105`}
+                >
+                  <h4 className="text-sm font-semibold">
+                    {dayjs(date).format("dddd DD/MM")}
+                  </h4>
+                  <div className="mt-2 flex flex-wrap gap-1">
+                    {dateSessions.map((dateSession, idx) => (
+                      <span
+                        key={`date-${idx}`}
+                        className="rounded-full bg-red-400 px-2 text-xs"
+                      >
+                        {dateSession.activity}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
       )}
