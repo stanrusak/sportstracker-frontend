@@ -81,10 +81,10 @@ const Sessions = () => {
     {},
   );
 
+  console.log(activitiesById);
   // group sessions by date
-  const sessions = userData.sessions
-    .slice(0, 15)
-    .reduce((result: { [key: string]: SessionType[] }, item: SessionType) => {
+  const sessions = userData.sessions.reduce(
+    (result: { [key: string]: SessionType[] }, item: SessionType) => {
       if (!result[item.date]) {
         result[item.date] = [];
       }
@@ -93,7 +93,9 @@ const Sessions = () => {
         activity: activitiesById[item.activity_id]?.name,
       });
       return result;
-    }, {});
+    },
+    {},
+  );
 
   const [selectedDate, setSelectedDate] = useState(
     Object.keys(sessions).length === 0 ? null : Object.keys(sessions)[0],
@@ -103,7 +105,7 @@ const Sessions = () => {
   const latestDate = Object.keys(sessions).length
     ? Object.keys(sessions)[0]
     : undefined;
-
+  console.log(sessions);
   return (
     <section className="">
       <div className="">
@@ -122,31 +124,33 @@ const Sessions = () => {
           />
           <div className="flex flex-col gap-1">
             <h5 className="mx-4 font-semibold">Latest workouts</h5>
-            {Object.entries(sessions).map(([date, dateSessions]) => (
-              <div
-                key={date}
-                onClick={() => setSelectedDate(date)}
-                className={` mx-2 flex w-[140px] cursor-pointer flex-col rounded-xl border-2 border-accent ${
-                  date === selectedDate
-                    ? "bg-accent text-white"
-                    : "bg-bgsecondary text-slate-200"
-                } p-4 shadow-md transition-all duration-300 hover:scale-105`}
-              >
-                <h4 className="text-sm font-semibold">
-                  {dayjs(date).format("dddd DD/MM")}
-                </h4>
-                <div className="mt-2 flex flex-wrap gap-1">
-                  {dateSessions.map((dateSession, idx) => (
-                    <span
-                      key={`date-${idx}`}
-                      className="rounded-full bg-red-400 px-2 text-xs"
-                    >
-                      {dateSession.activity}
-                    </span>
-                  ))}
+            {Object.entries(sessions)
+              .slice(0, 5)
+              .map(([date, dateSessions]) => (
+                <div
+                  key={date}
+                  onClick={() => setSelectedDate(date)}
+                  className={` mx-2 flex w-[140px] cursor-pointer flex-col rounded-xl border-2 border-accent ${
+                    date === selectedDate
+                      ? "bg-accent text-white"
+                      : "bg-bgsecondary text-slate-200"
+                  } p-4 shadow-md transition-all duration-300 hover:scale-105`}
+                >
+                  <h4 className="text-sm font-semibold">
+                    {dayjs(date).format("dddd DD/MM")}
+                  </h4>
+                  <div className="mt-2 flex flex-wrap gap-1">
+                    {dateSessions.map((dateSession, idx) => (
+                      <span
+                        key={`date-${idx}`}
+                        className="rounded-full bg-red-400 px-2 text-xs"
+                      >
+                        {dateSession.activity}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
       )}
