@@ -13,7 +13,7 @@ export class UnauthorizedError extends Error implements CustomErrorProps {
 
 export const getProtectedData = async <T>(
   endPoint: string,
-  token: string | null,
+  token: string | null = null,
 ): Promise<T> => {
   const response = await fetch(
     import.meta.env.VITE_BACKEND_URL + "/" + endPoint,

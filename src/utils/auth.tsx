@@ -1,10 +1,11 @@
-import { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState } from "react";
+import { UserData } from "../types/workouts";
 
 interface AuthContextType {
   token: string | null;
   setToken: (token: string | null) => void;
-  userData: {} | null;
-  setUserData: (userData: {} | null) => void;
+  userData: UserData | null;
+  setUserData: (userData: UserData | null) => void;
 }
 
 interface AuthProviderProps {
@@ -23,7 +24,7 @@ export const useAuth = () => useContext(AuthContext);
 const storedToken = localStorage.getItem("token");
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [token, setToken] = useState<string | null>(storedToken);
-  const [userData, setUserData] = useState<{} | null>({});
+  const [userData, setUserData] = useState<UserData | null>(null);
 
   return (
     <AuthContext.Provider value={{ token, setToken, userData, setUserData }}>
@@ -45,7 +46,6 @@ const postFormData = async (url: string, requestBody: URLSearchParams) => {
   if (!response.ok) {
     if (response.status === 401) throw new Error("Unauthorized");
     else {
-      console.log(await response.json());
       throw new Error("Request failed");
     }
   }
