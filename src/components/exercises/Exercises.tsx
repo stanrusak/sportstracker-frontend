@@ -4,26 +4,6 @@ import CreateExercise from "./CreateExercise";
 import { SiteButton } from "../layout/Layout";
 import { useAuth } from "../../utils/auth";
 
-interface MuscleType {
-  id: number;
-  name: string;
-  area: string;
-}
-
-interface ActivityType {
-  id: number;
-  name: string;
-  description: string;
-}
-
-export interface ExerciseType {
-  id: number;
-  name: string;
-  variation: string;
-  muscle_groups: MuscleType[];
-  activities: ActivityType[];
-}
-
 const ExerciseCard = ({
   exercise,
   userExercises = [],
