@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { getProtectedData, mutateProtectedData } from "../../utils/api";
 
 import {
@@ -178,7 +178,7 @@ const EditExercise = ({
   );
 };
 
-const CreateSession = ({ show }) => {
+const CreateSession = ({ show, setSelectedDate }) => {
   const [date, setDate] = useState<Dayjs>(dayjs());
   const [activities, setActivities] = useState([]);
   const [currentActivityId, setCurrentActivityId] = useState("");
@@ -245,9 +245,12 @@ const CreateSession = ({ show }) => {
       date: date.toISOString().slice(0, 10),
       session_data: { exercises: sessionExercises },
     };
-    const newSession = await mutateProtectedData("sessions/", data, token);
+    await mutateProtectedData("sessions/", data, token);
     const updatedSessions = await getProtectedData("sessions/", token);
-    setUserData({ ...userData, sessions: updatedSessions });
+    const updatedUserData = { ...userData, sessions: updatedSessions };
+    setSelectedDate(date.toISOString().slice(0, 10));
+    setUserData(updatedUserData);
+    // setUserData((prevData) => ({ ...prevData, sessions: updatedSessions }));
     show(false);
   };
   return (
