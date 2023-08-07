@@ -1,41 +1,17 @@
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "../../utils/auth";
-import CreateSession from "./NewSession";
+import { useWorkoutData } from "../../context/workouts";
 import { SiteButton } from "../layout/Layout";
-import dayjs from "dayjs";
-import { ActivityType } from "../../types";
+import { ActivityType } from "../../types/workouts";
+import CreateSession from "./NewSession";
 import activityImages from "../../assets/activities";
+import dayjs from "dayjs";
 
-interface SessionType {
-  id: number;
-  user_id: number;
-  activity_id: number;
-  date: string;
-  session_data: object;
-  activity?: string;
-}
+import { getAggregateSessionData } from "./utils";
 
 const SelectedWorkoutDay = ({ date, dateSessions, latest }) => {
   if (date === "") return <div>Loading...</div>;
-
   const dateString = dayjs(date).format("dddd DD/MM/YYYY");
-
-  const getAggregateExerciseData = (setData) => {
-    let max = 0;
-    let volume = 0;
-    setData.forEach((set) => {
-      max = Math.max(max, set.weight);
-      volume += set.weight * set.reps;
-    });
-    return { max, volume };
-  };
-
-  const getAggregateSessionData = (sessionData) => {
-    return sessionData["exercises"].map((exercise) => ({
-      name: exercise.name,
-      ...getAggregateExerciseData(exercise.sets),
-    }));
-  };
 
   return (
     <div className="flex h-full w-[350px] flex-col rounded-xl  bg-bgsecondary  shadow-md transition-all duration-300 hover:scale-105">
@@ -72,8 +48,12 @@ const SelectedWorkoutDay = ({ date, dateSessions, latest }) => {
 };
 
 const Sessions = () => {
+  const [showCreateNewSession, setShowCreateNewSession] = useState(false);
+
   const { userData } = useAuth();
-  const activitiesById = userData.activities.reduce(
+  const { allActivities, allMuscles } = useWorkoutData();
+  // group activities by id
+  const activitiesById = allActivities.reduce(
     (result: { [key: number]: ActivityType }, item: ActivityType) => {
       result[item.id] = item;
       return result;
@@ -81,31 +61,30 @@ const Sessions = () => {
     {},
   );
 
-  console.log(activitiesById);
   // group sessions by date
-  const sessions = userData.sessions.reduce(
-    (result: { [key: string]: SessionType[] }, item: SessionType) => {
-      if (!result[item.date]) {
-        result[item.date] = [];
-      }
-      result[item.date].push({
-        ...item,
-        activity: activitiesById[item.activity_id]?.name,
-      });
-      return result;
-    },
-    {},
-  );
-
-  const [selectedDate, setSelectedDate] = useState(
-    Object.keys(sessions).length === 0 ? null : Object.keys(sessions)[0],
-  );
-  const [showCreateNewSession, setShowCreateNewSession] = useState(false);
+  if (userData === null) return <p>Error</p>;
+  const sessions = userData.sessions.reduce((result, session) => {
+    const { date, ...rest } = session;
+    if (!result[date]) {
+      result[date] = [];
+    }
+    result[date].push({
+      ...session,
+      activity: activitiesById[session.activity_id]?.name,
+    });
+    return result;
+  }, {});
 
   const latestDate = Object.keys(sessions).length
     ? Object.keys(sessions)[0]
     : undefined;
-  console.log(sessions);
+
+  const [selectedDate, setSelectedDate] = useState(latestDate);
+  // useEffect(() => {
+  //   if (Object.keys(sessions).length === 0) return;
+  //   setSelectedDate(latestDate);
+  // }, [sessions]);
+
   return (
     <section className="">
       <div className="">
@@ -114,12 +93,17 @@ const Sessions = () => {
           New Training Session
         </SiteButton>
       </div>
-      {showCreateNewSession && <CreateSession show={setShowCreateNewSession} />}
+      {showCreateNewSession && (
+        <CreateSession
+          show={setShowCreateNewSession}
+          setSelectedDate={setSelectedDate}
+        />
+      )}
       {!!Object.keys(sessions).length && (
         <div className="mt-2 flex">
           <SelectedWorkoutDay
             date={selectedDate}
-            dateSessions={sessions[selectedDate]}
+            dateSessions={selectedDate ? sessions[selectedDate] : undefined}
             latest={selectedDate === latestDate}
           />
           <div className="flex flex-col gap-1">
