@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Navbar } from "./components/Navbar";
 import LandingPage from "./pages/LandingPage";
 import Dashboard from "./pages/Dashboard";
+import Statistics from "./pages/Statistics";
 import { useAuth } from "./utils/auth";
 
 import Sidebar from "./components/sidebar/Sidebar";
@@ -101,6 +102,7 @@ const App = () => {
                 </h1>
                 <div className="flex gap-4">
                   {activePage === "Dashboard" && <Dashboard />}
+                  {activePage === "Statistics" && <Statistics />}
                 </div>
               </div>
             </div>
